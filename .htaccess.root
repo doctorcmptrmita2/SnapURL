@@ -1,0 +1,7 @@
+# Bu dosyayı public_html ana dizinine .htaccess olarak koyun
+# Tüm istekleri public klasörüne yönlendirir
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>

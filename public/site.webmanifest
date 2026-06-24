@@ -1,0 +1,23 @@
+{
+    "name": "SnapURL.to",
+    "short_name": "SnapURL",
+    "description": "Privacy-first URL shortener with advanced analytics",
+    "icons": [
+        {
+            "src": "/favicon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml"
+        },
+        {
+            "src": "/favicon.ico",
+            "sizes": "32x32",
+            "type": "image/x-icon"
+        }
+    ],
+    "theme_color": "#2563eb",
+    "background_color": "#ffffff",
+    "display": "standalone",
+    "start_url": "/",
+    "scope": "/"
+}
+

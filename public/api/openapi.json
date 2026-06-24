@@ -1,0 +1,312 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "SnapURL.to API",
+    "version": "1.0.0",
+    "description": "Privacy-first URL shortener and analytics platform API"
+  },
+  "servers": [
+    {
+      "url": "https://snapurl.to/api/v1",
+      "description": "Production server"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/links": {
+      "get": {
+        "summary": "List all links",
+        "tags": ["Links"],
+        "responses": {
+          "200": {
+            "description": "List of links",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Link"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new link",
+        "tags": ["Links"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LinkInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Link created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Link"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/links/{id}": {
+      "get": {
+        "summary": "Get a link",
+        "tags": ["Links"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Link details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Link"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a link",
+        "tags": ["Links"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LinkInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Link updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Link"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a link",
+        "tags": ["Links"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Link deleted"
+          }
+        }
+      }
+    },
+    "/links/{id}/stats": {
+      "get": {
+        "summary": "Get link statistics",
+        "tags": ["Links"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Link statistics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinkStats"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "Link": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "destination_url": {
+            "type": "string"
+          },
+          "short_url": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "max_clicks": {
+            "type": "integer",
+            "nullable": true
+          },
+          "click_count": {
+            "type": "integer"
+          },
+          "unique_click_count": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["active", "paused", "expired"]
+          },
+          "has_password": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "LinkInput": {
+        "type": "object",
+        "required": ["destination_url"],
+        "properties": {
+          "destination_url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "slug": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 50
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "password": {
+            "type": "string",
+            "minLength": 4,
+            "maxLength": 100
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "max_clicks": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000000
+          }
+        }
+      },
+      "LinkStats": {
+        "type": "object",
+        "properties": {
+          "total_clicks": {
+            "type": "integer"
+          },
+          "unique_clicks": {
+            "type": "integer"
+          },
+          "analytics": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "devices": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "countries": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
