@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 
 class BlogController extends Controller
 {
-    private function getArticles()
+    public static function getArticles()
     {
         return [
             [
@@ -284,13 +284,13 @@ class BlogController extends Controller
 
     public function index()
     {
-        $articles = $this->getArticles();
+        $articles = self::getArticles();
         return view('blog.index', compact('articles'));
     }
 
     public function show($slug)
     {
-        $articles = $this->getArticles();
+        $articles = self::getArticles();
         $article = collect($articles)->firstWhere('slug', $slug);
         
         if (!$article) {

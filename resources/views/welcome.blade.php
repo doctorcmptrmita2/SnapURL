@@ -30,7 +30,32 @@
       }
     }
     </script>
-    
+
+    <script type="application/ld+json">
+    {
+      "@@context": "https://schema.org",
+      "@@type": "Organization",
+      "name": "SnapURL",
+      "url": "https://snapurl.to",
+      "logo": "https://snapurl.to/favicon.svg",
+      "description": "SnapURL is a free URL shortener with click analytics and QR codes — no signup required."
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {
+      "@@context": "https://schema.org",
+      "@@type": "FAQPage",
+      "mainEntity": [
+        {"@@type":"Question","name":"Is SnapURL really free?","acceptedAnswer":{"@@type":"Answer","text":"Yes. You can shorten as many links as you like for free, and you don't even need to create an account to get started."}},
+        {"@@type":"Question","name":"Do my short links ever expire?","acceptedAnswer":{"@@type":"Answer","text":"Your links stay active by default. If you want, you can set an optional expiration date or a maximum number of clicks when you create or edit a link."}},
+        {"@@type":"Question","name":"Can I see how many people clicked my link?","acceptedAnswer":{"@@type":"Answer","text":"Absolutely. Every link includes free click analytics. Sign in to your dashboard to view total clicks and trends over time."}},
+        {"@@type":"Question","name":"Does every link get a QR code?","acceptedAnswer":{"@@type":"Answer","text":"Yes, a scannable QR code is generated for every short link, so you can bridge your offline and online audiences instantly."}},
+        {"@@type":"Question","name":"Are shortened links safe to click?","acceptedAnswer":{"@@type":"Answer","text":"SnapURL checks destinations against trusted safe-browsing databases and blocks known phishing and malware sites, helping keep every link you create trustworthy."}}
+      ]
+    }
+    </script>
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     
     <!-- Google AdSense -->

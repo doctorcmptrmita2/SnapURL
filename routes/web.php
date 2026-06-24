@@ -3,11 +3,15 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LinkController;
 use App\Http\Controllers\RedirectController;
+use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
+
+// Dynamic sitemap (includes all blog posts) — must be before the redirect catch-all
+Route::get('/sitemap.xml', [SitemapController::class, 'index']);
 
 // Auth routes - must be before redirect route
 require __DIR__.'/auth.php';
