@@ -13,6 +13,11 @@ Route::get('/', function () {
 // Dynamic sitemap (includes all blog posts) — must be before the redirect catch-all
 Route::get('/sitemap.xml', [SitemapController::class, 'index']);
 
+// Legacy URLs from the previous app version (/items/*, /public/items/*).
+// Return 410 Gone so search engines drop them from the index.
+Route::any('/items/{any}', fn () => abort(410))->where('any', '.*');
+Route::any('/public/{any}', fn () => abort(410))->where('any', '.*');
+
 // Auth routes - must be before redirect route
 require __DIR__.'/auth.php';
 

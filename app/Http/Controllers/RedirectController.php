@@ -52,7 +52,9 @@ class RedirectController extends Controller
         // Clear cache
         Cache::forget($cacheKey);
 
-        // Redirect with 301 (SEO-friendly)
-        return redirect($link->destination_url, 301);
+        // Redirect with 301 (SEO-friendly). Mark noindex so the short link
+        // itself is never indexed — only the destination matters.
+        return redirect($link->destination_url, 301)
+            ->header('X-Robots-Tag', 'noindex');
     }
 }
