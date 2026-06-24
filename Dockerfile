@@ -10,18 +10,7 @@ COPY vite.config.js tailwind.config.js postcss.config.js ./
 COPY public ./public
 RUN npm run build
 
-# ---------- Stage 2: composer (PHP) dependencies ----------
-FROM composer:2 AS vendor
-WORKDIR /app
-COPY composer.json composer.lock ./
-RUN composer install \
-    --no-dev \
-    --no-scripts \
-    --no-autoloader \
-    --prefer-dist \
-    --no-interaction
-
-# ---------- Stage 3: runtime ----------
+# ---------- Stage 2: runtime ----------
 FROM php:8.3-fpm AS runtime
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -38,13 +27,13 @@ WORKDIR /var/www/html
 # Application source
 COPY . /var/www/html
 
-# Bring in installed deps and built assets
-COPY --from=vendor /app/vendor /var/www/html/vendor
+# Built front-end assets
 COPY --from=assets /app/public/build /var/www/html/public/build
 
-# Finish composer setup (dump optimized autoloader, run package discovery)
-RUN composer dump-autoload --no-dev --optimize \
-    && composer run-script post-autoload-dump || true
+# Install PHP dependencies here (PHP 8.3 runtime satisfies all platform reqs)
+RUN composer install --no-dev --optimize-autoloader --prefer-dist --no-interaction --no-scripts \
+    && composer dump-autoload --no-dev --optimize \
+    && php artisan package:discover --ansi || true
 
 # Container configuration
 COPY docker/nginx/default.conf /etc/nginx/sites-available/default
