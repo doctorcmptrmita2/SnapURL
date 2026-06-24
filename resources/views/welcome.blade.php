@@ -426,6 +426,111 @@
         </div>
     </section>
 
+    <!-- SEO / About content -->
+    <section class="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50 border-t border-gray-100">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">What Is SnapURL?</h2>
+            <p class="text-gray-600 leading-relaxed mb-4">
+                <strong>SnapURL</strong> is a free URL shortener that turns long, complicated web
+                addresses into short, clean, and easy-to-share links. Instead of pasting a messy
+                link full of tracking parameters, you get a tidy <code class="px-1.5 py-0.5 bg-gray-100 rounded text-sm">snapurl.to/abc123</code>
+                link that looks professional and works everywhere — in social media bios, emails,
+                SMS messages, presentations, printed materials, and QR codes. Every shortened link
+                also comes with built-in click analytics and an instant QR code, so you can track
+                performance and reach your audience on any device.
+            </p>
+            <p class="text-gray-600 leading-relaxed mb-4">
+                You don't need an account to get started. Just paste your link, click
+                <em>Shorten</em>, and copy your new short URL. If you sign up for a free account,
+                you can manage all your links in one dashboard, edit destinations, set passwords,
+                add expiration dates, and view detailed click statistics over time. Learn more in
+                our guide on <a href="{{ route('blog.show', 'what-is-url-shortener') }}" class="text-orange-600 hover:underline font-medium">what a URL shortener is</a>.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Why Shorten Your URLs?</h2>
+            <p class="text-gray-600 leading-relaxed mb-5">
+                Short links aren't just shorter — they're smarter. A good URL shortener helps your
+                links look trustworthy, fit within character limits, and tell you exactly how your
+                audience is engaging. Here's what you get with SnapURL:
+            </p>
+            <ul class="space-y-3 mb-4">
+                <li class="flex items-start gap-3 text-gray-600">
+                    <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd"/></svg>
+                    <span><strong>100% free, no signup required.</strong> Create unlimited short links without paying or registering.</span>
+                </li>
+                <li class="flex items-start gap-3 text-gray-600">
+                    <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd"/></svg>
+                    <span><strong>Click analytics.</strong> See how many people click your links and when, so you can measure what works. Read more about <a href="{{ route('blog.show', 'link-tracking-analytics') }}" class="text-orange-600 hover:underline font-medium">link tracking and analytics</a>.</span>
+                </li>
+                <li class="flex items-start gap-3 text-gray-600">
+                    <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd"/></svg>
+                    <span><strong>Free QR codes.</strong> Every link gets a scannable QR code — perfect for posters, packaging, and events. See our <a href="{{ route('blog.show', 'qr-codes-marketing-guide') }}" class="text-orange-600 hover:underline font-medium">QR code marketing guide</a>.</span>
+                </li>
+                <li class="flex items-start gap-3 text-gray-600">
+                    <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd"/></svg>
+                    <span><strong>Password protection &amp; expiration.</strong> Keep sensitive links private or make them expire automatically after a date or click limit.</span>
+                </li>
+                <li class="flex items-start gap-3 text-gray-600">
+                    <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd"/></svg>
+                    <span><strong>Cleaner sharing.</strong> Short, branded links are easier to remember, look more trustworthy, and fit platforms with strict character limits.</span>
+                </li>
+            </ul>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Who Is SnapURL For?</h2>
+            <p class="text-gray-600 leading-relaxed mb-4">
+                SnapURL works for anyone who shares links online. <strong>Marketers and businesses</strong>
+                use it to track campaigns and add UTM parameters — see our
+                <a href="{{ route('blog.show', 'utm-parameters-guide') }}" class="text-orange-600 hover:underline font-medium">UTM parameters guide</a>.
+                <strong>Content creators and influencers</strong> shorten links for their
+                <a href="{{ route('blog.show', 'url-shortener-for-social-media') }}" class="text-orange-600 hover:underline font-medium">social media bios and posts</a>,
+                where every character counts. <strong>Small businesses</strong> add QR codes to menus,
+                flyers, and product packaging. And <strong>everyday users</strong> simply want a quick,
+                clean way to share a link without exposing a giant URL.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Safe and Privacy-First by Design</h2>
+            <p class="text-gray-600 leading-relaxed mb-4">
+                Trust matters with short links, because the destination is hidden until someone clicks.
+                That's why SnapURL automatically screens every link against known phishing and malware
+                databases and blocks unsafe destinations before they can be shortened. We also protect
+                the service with bot detection and abuse limits, so the links you share stay clean and
+                reliable. You can read more about staying safe in our article on
+                <a href="{{ route('blog.show', 'url-shortener-security') }}" class="text-orange-600 hover:underline font-medium">URL shortener security</a>.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-5">Frequently Asked Questions</h2>
+            <div class="space-y-6">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-1">Is SnapURL really free?</h3>
+                    <p class="text-gray-600 leading-relaxed">Yes. You can shorten as many links as you like for free, and you don't even need to create an account to get started.</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-1">Do my short links ever expire?</h3>
+                    <p class="text-gray-600 leading-relaxed">Your links stay active by default. If you want, you can set an optional expiration date or a maximum number of clicks when you create or edit a link.</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-1">Can I see how many people clicked my link?</h3>
+                    <p class="text-gray-600 leading-relaxed">Absolutely. Every link includes free click analytics. Sign in to your dashboard to view total clicks and trends over time.</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-1">Does every link get a QR code?</h3>
+                    <p class="text-gray-600 leading-relaxed">Yes — a scannable QR code is generated for every short link, so you can bridge your offline and online audiences instantly.</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-1">Are shortened links safe to click?</h3>
+                    <p class="text-gray-600 leading-relaxed">SnapURL checks destinations against trusted safe-browsing databases and blocks known phishing and malware sites, helping keep every link you create trustworthy.</p>
+                </div>
+            </div>
+
+            <p class="text-gray-600 leading-relaxed mt-10">
+                Ready to try it? <a href="#" onclick="document.getElementById('destination_url').focus(); window.scrollTo({top: 0, behavior: 'smooth'}); return false;" class="text-orange-600 hover:underline font-medium">Shorten your first link</a>,
+                explore more tips on our <a href="{{ route('blog.index') }}" class="text-orange-600 hover:underline font-medium">blog</a>,
+                or read our <a href="{{ route('pages.faq') }}" class="text-orange-600 hover:underline font-medium">FAQ</a> and
+                <a href="{{ route('pages.about') }}" class="text-orange-600 hover:underline font-medium">about page</a> to learn more about SnapURL.
+            </p>
+        </div>
+    </section>
+
     <!-- Footer -->
     <footer class="bg-gray-900 text-white py-14 px-4 sm:px-6 lg:px-8">
         <div class="max-w-6xl mx-auto">
