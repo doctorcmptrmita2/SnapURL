@@ -9,17 +9,6 @@ use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-        $this->middleware(function ($request, $next) {
-            if (!auth()->user()->is_admin) {
-                abort(403);
-            }
-            return $next($request);
-        });
-    }
-
     /**
      * Show admin dashboard.
      */

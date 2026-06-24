@@ -9,7 +9,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 // API v1 routes
-Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
+Route::prefix('v1')->middleware(['auth:sanctum', 'throttle:100,1'])->group(function () {
     Route::apiResource('links', LinkController::class);
     Route::get('/links/{link}/stats', [LinkController::class, 'stats'])->name('links.stats');
 });

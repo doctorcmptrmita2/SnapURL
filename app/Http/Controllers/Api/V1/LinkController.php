@@ -15,7 +15,6 @@ class LinkController extends Controller
     public function __construct(
         private LinkService $linkService
     ) {
-        $this->middleware('throttle:100,1'); // 100 requests per minute
     }
 
     /**

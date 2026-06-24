@@ -49,8 +49,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/links/{link}', [LinkController::class, 'destroy'])->name('links.destroy');
     Route::get('/links/{link}/qrcode', [LinkController::class, 'qrcode'])->name('links.qrcode');
 
-    // Admin routes
-    Route::prefix('admin')->name('admin.')->group(function () {
+    // Admin routes (require is_admin in addition to the auth group above)
+    Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
         Route::get('/users', [\App\Http\Controllers\Admin\DashboardController::class, 'users'])->name('users');
         Route::get('/links', [\App\Http\Controllers\Admin\DashboardController::class, 'links'])->name('links');
