@@ -2,8 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\SafeUrl;
+use App\Support\Turnstile;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class StoreLinkRequest extends FormRequest
 {
@@ -25,7 +28,7 @@ class StoreLinkRequest extends FormRequest
         $userId = $this->user()?->id;
 
         return [
-            'destination_url' => ['required', 'url', 'max:2048'],
+            'destination_url' => ['required', 'url', 'max:2048', new SafeUrl()],
             'slug' => [
                 'nullable',
                 'string',
@@ -42,5 +45,28 @@ class StoreLinkRequest extends FormRequest
             'expires_at' => ['nullable', 'date', 'after:now'],
             'max_clicks' => ['nullable', 'integer', 'min:1', 'max:1000000'],
         ];
+    }
+
+    /**
+     * Require a valid captcha for guest (anonymous) submissions when Turnstile
+     * is configured. Authenticated users and API token requests are exempt.
+     */
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator) {
+            if ($this->user()) {
+                return; // logged-in users skip captcha
+            }
+
+            $turnstile = app(Turnstile::class);
+            if (! $turnstile->enabled()) {
+                return; // captcha not configured
+            }
+
+            $token = $this->input('cf-turnstile-response');
+            if (! $turnstile->verify($token, $this->ip())) {
+                $validator->errors()->add('captcha', 'Captcha verification failed. Please try again.');
+            }
+        });
     }
 }

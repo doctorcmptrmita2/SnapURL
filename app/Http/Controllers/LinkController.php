@@ -44,8 +44,12 @@ class LinkController extends Controller
     public function store(StoreLinkRequest $request)
     {
         try {
+            $data = $request->validated();
+            // Record a hashed IP so anonymous creators are traceable / rate-limitable.
+            $data['ip_hash'] = hash('sha256', (string) $request->ip());
+
             $link = $this->linkService->createLink(
-                $request->validated(),
+                $data,
                 $request->user()?->id
             );
 

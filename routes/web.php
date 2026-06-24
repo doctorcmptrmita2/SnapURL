@@ -29,8 +29,10 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-// Public link creation (no auth required)
-Route::post('/links', [LinkController::class, 'store'])->name('links.store');
+// Public link creation (no auth required) — rate limited against spam/abuse
+Route::post('/links', [LinkController::class, 'store'])
+    ->middleware('throttle:link-create')
+    ->name('links.store');
 
 // Authenticated routes - must be before redirect route
 Route::middleware('auth')->group(function () {

@@ -147,6 +147,11 @@
                             </button>
                         </div>
                         
+                        @if(config('services.turnstile.site_key'))
+                        <!-- Captcha (anti-spam) -->
+                        <div class="cf-turnstile flex justify-center" data-sitekey="{{ config('services.turnstile.site_key') }}"></div>
+                        @endif
+
                         <!-- Result Container -->
                         <div id="resultContainer" class="hidden mt-4 p-4 bg-green-50 border border-green-200 rounded-xl">
                             <div class="flex flex-col sm:flex-row items-center gap-3">
@@ -472,6 +477,10 @@
     <!-- Cookie Consent -->
     <x-cookie-consent />
 
+    @if(config('services.turnstile.site_key'))
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    @endif
+
     <!-- JavaScript -->
     <script>
         document.getElementById('shortenForm').addEventListener('submit', async function(e) {
@@ -498,7 +507,10 @@
                         'Accept': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                     },
-                    body: JSON.stringify({ destination_url: url })
+                    body: JSON.stringify({
+                        destination_url: url,
+                        'cf-turnstile-response': document.querySelector('[name="cf-turnstile-response"]')?.value
+                    })
                 });
                 
                 const data = await response.json();
@@ -516,6 +528,7 @@
             } finally {
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
+                if (window.turnstile) { window.turnstile.reset(); }
             }
         });
         
