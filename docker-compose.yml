@@ -1,84 +1,86 @@
-version: '3.8'
-
+# Production / Dokploy deployment stack.
+# For local development use `composer dev` (artisan serve + vite) instead.
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: snapurl_app
     restart: unless-stopped
-    working_dir: /var/www/html
-    volumes:
-      - ./:/var/www/html
-      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
-    networks:
-      - snapurl
+    env_file: .env
+    environment:
+      CONTAINER_ROLE: app
     depends_on:
       - db
       - redis
-
-  nginx:
-    image: nginx:alpine
-    container_name: snapurl_nginx
-    restart: unless-stopped
-    ports:
-      - "8080:80"
+    expose:
+      - "80"
     volumes:
-      - ./:/var/www/html
-      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - storage_data:/var/www/html/storage/app
     networks:
       - snapurl
+      - dokploy-network
+
+  queue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      CONTAINER_ROLE: queue
+    command: php artisan queue:work --tries=3 --sleep=3 --timeout=90
     depends_on:
-      - app
+      - db
+      - redis
+    volumes:
+      - storage_data:/var/www/html/storage/app
+    networks:
+      - snapurl
+
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      CONTAINER_ROLE: scheduler
+    command: php artisan schedule:work
+    depends_on:
+      - db
+      - redis
+    networks:
+      - snapurl
 
   db:
     image: mysql:8.0
-    container_name: snapurl_db
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: snapurl
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_PASSWORD: root
-      MYSQL_USER: snapurl
-    ports:
-      - "3306:3306"
+      MYSQL_DATABASE: ${DB_DATABASE:-snapurl}
+      MYSQL_USER: ${DB_USERNAME:-snapurl}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootsecret}
     volumes:
       - db_data:/var/lib/mysql
     networks:
       - snapurl
 
   redis:
-    image: redis:alpine
-    container_name: snapurl_redis
+    image: redis:7-alpine
     restart: unless-stopped
-    ports:
-      - "6379:6379"
     volumes:
       - redis_data:/data
     networks:
       - snapurl
 
-  queue:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: snapurl_queue
-    restart: unless-stopped
-    working_dir: /var/www/html
-    volumes:
-      - ./:/var/www/html
-    command: php artisan queue:work --tries=3
-    networks:
-      - snapurl
-    depends_on:
-      - db
-      - redis
-
 volumes:
   db_data:
   redis_data:
+  storage_data:
 
 networks:
   snapurl:
     driver: bridge
-
+  # Dokploy's Traefik network — lets the Domain you set in the UI route to `app`.
+  dokploy-network:
+    external: true

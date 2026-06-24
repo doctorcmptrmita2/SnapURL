@@ -1,33 +1,62 @@
-FROM php:8.3-fpm
+# syntax=docker/dockerfile:1
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    zip \
-    unzip \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd \
-    && docker-php-ext-enable pdo_mysql mbstring exif pcntl bcmath gd
+# ---------- Stage 1: build front-end assets ----------
+FROM node:20-alpine AS assets
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY resources ./resources
+COPY vite.config.js tailwind.config.js postcss.config.js ./
+COPY public ./public
+RUN npm run build
 
-# Install Redis extension
-RUN pecl install redis && docker-php-ext-enable redis
+# ---------- Stage 2: composer (PHP) dependencies ----------
+FROM composer:2 AS vendor
+WORKDIR /app
+COPY composer.json composer.lock ./
+RUN composer install \
+    --no-dev \
+    --no-scripts \
+    --no-autoloader \
+    --prefer-dist \
+    --no-interaction
 
-# Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# ---------- Stage 3: runtime ----------
+FROM php:8.3-fpm AS runtime
 
-# Set working directory
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git curl libpng-dev libonig-dev libxml2-dev libzip-dev zip unzip \
+    nginx supervisor \
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip \
+    && pecl install redis && docker-php-ext-enable redis \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
 WORKDIR /var/www/html
 
-# Copy existing application directory permissions
-COPY --chown=www-data:www-data . /var/www/html
+# Application source
+COPY . /var/www/html
 
-# Change current user to www
-USER www-data
+# Bring in installed deps and built assets
+COPY --from=vendor /app/vendor /var/www/html/vendor
+COPY --from=assets /app/public/build /var/www/html/public/build
 
-# Expose port 9000 and start php-fpm server
-EXPOSE 9000
-CMD ["php-fpm"]
+# Finish composer setup (dump optimized autoloader, run package discovery)
+RUN composer dump-autoload --no-dev --optimize \
+    && composer run-script post-autoload-dump || true
 
+# Container configuration
+COPY docker/nginx/default.conf /etc/nginx/sites-available/default
+RUN ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+COPY docker/php/local.ini /usr/local/etc/php/conf.d/local.ini
+COPY docker/supervisor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+RUN chown -R www-data:www-data storage bootstrap/cache
+
+EXPOSE 80
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
