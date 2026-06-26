@@ -2,9 +2,10 @@
 
 namespace App\Rules;
 
+use App\Models\AbuseLog;
+use App\Support\SafeBrowsing;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Support\Facades\Http;
 
 /**
  * Validates that a destination URL is safe to shorten:
@@ -12,7 +13,9 @@ use Illuminate\Support\Facades\Http;
  *  - not pointing back to this site (loop / abuse amplification)
  *  - not localhost / internal / private or reserved IP ranges (SSRF + abuse)
  *  - not on the configured domain blocklist
- *  - optionally checked against Google Safe Browsing (when an API key is set)
+ *  - not flagged by Google Safe Browsing (when an API key is set)
+ *
+ * Every block is recorded to the abuse log for admin visibility.
  */
 class SafeUrl implements ValidationRule
 {
@@ -22,13 +25,13 @@ class SafeUrl implements ValidationRule
         $parts = parse_url($url);
 
         if ($parts === false || empty($parts['scheme']) || empty($parts['host'])) {
-            $fail('The :attribute is not a valid URL.');
+            $this->block($fail, 'invalid_url', $url, 'The :attribute is not a valid URL.');
             return;
         }
 
         $scheme = strtolower($parts['scheme']);
         if (! in_array($scheme, ['http', 'https'], true)) {
-            $fail('Only http and https links can be shortened.');
+            $this->block($fail, 'scheme', $url, 'Only http and https links can be shortened.');
             return;
         }
 
@@ -39,7 +42,7 @@ class SafeUrl implements ValidationRule
         if ($appHost) {
             $appHost = strtolower($appHost);
             if ($host === $appHost || str_ends_with($host, '.' . $appHost)) {
-                $fail('You cannot shorten a link that points to this site.');
+                $this->block($fail, 'self_link', $url, 'You cannot shorten a link that points to this site.');
                 return;
             }
         }
@@ -47,7 +50,7 @@ class SafeUrl implements ValidationRule
         // Obvious internal / metadata endpoints.
         $blockedHosts = ['localhost', '0.0.0.0', '::1', 'metadata.google.internal', '169.254.169.254'];
         if (in_array($host, $blockedHosts, true)) {
-            $fail('This destination is not allowed.');
+            $this->block($fail, 'internal', $url, 'This destination is not allowed.');
             return;
         }
 
@@ -55,7 +58,7 @@ class SafeUrl implements ValidationRule
         foreach ((array) config('linkguard.blocked_domains', []) as $bad) {
             $bad = strtolower(trim($bad));
             if ($bad !== '' && ($host === $bad || str_ends_with($host, '.' . $bad))) {
-                $fail('This destination domain is blocked.');
+                $this->block($fail, 'blocklist', $url, 'This destination domain is blocked.');
                 return;
             }
         }
@@ -64,34 +67,20 @@ class SafeUrl implements ValidationRule
         $ip = filter_var($host, FILTER_VALIDATE_IP) ? $host : gethostbyname($host);
         if ($ip && filter_var($ip, FILTER_VALIDATE_IP)
             && ! filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
-            $fail('This destination is not allowed.');
+            $this->block($fail, 'ssrf', $url, 'This destination is not allowed.');
             return;
         }
 
-        // Optional Google Safe Browsing check (only if configured).
-        $key = config('services.safebrowsing.key');
-        if ($key) {
-            try {
-                $resp = Http::timeout(4)->post(
-                    'https://safebrowsing.googleapis.com/v4/threatMatches:find?key=' . $key,
-                    [
-                        'client' => ['clientId' => 'snapurl', 'clientVersion' => '1.0'],
-                        'threatInfo' => [
-                            'threatTypes' => ['MALWARE', 'SOCIAL_ENGINEERING', 'UNWANTED_SOFTWARE', 'POTENTIALLY_HARMFUL_APPLICATION'],
-                            'platformTypes' => ['ANY_PLATFORM'],
-                            'threatEntryTypes' => ['URL'],
-                            'threatEntries' => [['url' => $url]],
-                        ],
-                    ]
-                );
-
-                if ($resp->successful() && ! empty($resp->json('matches'))) {
-                    $fail('This URL was flagged as unsafe and cannot be shortened.');
-                    return;
-                }
-            } catch (\Throwable $e) {
-                // Fail open: don't block legitimate users if the API is unreachable.
-            }
+        // Google Safe Browsing (only if configured).
+        if (app(SafeBrowsing::class)->isThreat($url)) {
+            $this->block($fail, 'safe_browsing', $url, 'This URL was flagged as unsafe and cannot be shortened.');
+            return;
         }
+    }
+
+    private function block(Closure $fail, string $reason, string $url, string $message): void
+    {
+        AbuseLog::record($reason, $url);
+        $fail($message);
     }
 }

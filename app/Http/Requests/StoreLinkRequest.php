@@ -65,6 +65,7 @@ class StoreLinkRequest extends FormRequest
 
             $token = $this->input('cf-turnstile-response');
             if (! $turnstile->verify($token, $this->ip())) {
+                \App\Models\AbuseLog::record('captcha', $this->input('destination_url'), $this);
                 $validator->errors()->add('captcha', 'Captcha verification failed. Please try again.');
             }
         });

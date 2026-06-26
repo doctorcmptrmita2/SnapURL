@@ -62,7 +62,10 @@ Route::middleware('auth')->group(function () {
     Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
         Route::get('/users', [\App\Http\Controllers\Admin\DashboardController::class, 'users'])->name('users');
+        Route::delete('/users/{user}', [\App\Http\Controllers\Admin\DashboardController::class, 'destroyUser'])->name('users.destroy');
         Route::get('/links', [\App\Http\Controllers\Admin\DashboardController::class, 'links'])->name('links');
+        Route::delete('/links/{link}', [\App\Http\Controllers\Admin\DashboardController::class, 'destroyLink'])->name('links.destroy');
+        Route::get('/abuse-logs', [\App\Http\Controllers\Admin\DashboardController::class, 'abuseLogs'])->name('abuse');
         Route::get('/settings/adsense', [\App\Http\Controllers\Admin\SettingsController::class, 'adsense'])->name('settings.adsense');
         Route::post('/settings/adsense', [\App\Http\Controllers\Admin\SettingsController::class, 'updateAdsense'])->name('settings.adsense.update');
     });

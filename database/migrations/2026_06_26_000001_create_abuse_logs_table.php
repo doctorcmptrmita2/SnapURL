@@ -1,0 +1,25 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('abuse_logs', function (Blueprint $table) {
+            $table->id();
+            $table->string('reason')->index();        // captcha, blocklist, safe_browsing, ssrf, scheme...
+            $table->string('ip_address', 45)->nullable()->index();
+            $table->text('detail')->nullable();       // attempted URL or message
+            $table->text('user_agent')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('abuse_logs');
+    }
+};
