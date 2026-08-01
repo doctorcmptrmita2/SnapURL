@@ -56,7 +56,7 @@
                                     <td class="px-4 py-3 whitespace-nowrap">{{ $log->created_at?->format('Y-m-d H:i:s') }}</td>
                                     <td class="px-4 py-3">
                                         <span class="px-2 py-0.5 rounded-full text-xs font-medium
-                                            @if (in_array($log->reason, ['safe_browsing','safe_browsing_rescan','blocklist','ssrf','internal'])) bg-red-100 text-red-700
+                                            @if (in_array($log->reason, ['safe_browsing','safe_browsing_rescan','blocklist','ssrf','internal','brand_impersonation','ephemeral_host','shortener_chain','blocked_tld'])) bg-red-100 text-red-700
                                             @elseif ($log->reason === 'captcha') bg-yellow-100 text-yellow-700
                                             @else bg-gray-100 text-gray-600 @endif">
                                             {{ $log->reason }}
